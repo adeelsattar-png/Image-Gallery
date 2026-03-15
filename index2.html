@@ -268,7 +268,7 @@
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.dataset.index = index;
-                item.innerHTML = `<div class="category">${image.category}</div><img src="${image.src}" alt="${image.title}" loading="lazy">`;
+                const categoryDiv = document.createElement('div'); categoryDiv.className = 'category'; categoryDiv.textContent = image.category; item.appendChild(categoryDiv); const imgEl = document.createElement('img'); imgEl.src = image.src; imgEl.alt = image.title; imgEl.loading = 'lazy'; item.appendChild(imgEl);
                 item.addEventListener('click', () => openLightbox(index));
                 gallery.appendChild(item);
             });
