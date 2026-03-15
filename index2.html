@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Image Gallery - Black & Golden</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid #FFD700;
+            border-radius: 25px;
+            background: transparent;
+            color: #FFD700;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #FFD700;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,215,0,0.4);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.2);
+            height: 250px;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255,215,0,0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        .gallery-item .category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,215,0,0.9);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            transform: scale(0);
+            animation: lightboxIn 0.4s ease forwards;
+        }
+
+        @keyframes lightboxIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #FFD700;
+            border: none;
+            color: #000;
+            font-size: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-close:hover {
+            background: #FFA500;
+            transform: scale(1.1);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,215,0,0.8);
+            border: none;
+            color: #000;
+            font-size: 40px;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox-nav:hover {
+            background: #FFD700;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lightbox-prev {
+            left: 30px;
+        }
+
+        .lightbox-next {
+            right: 30px;
+        }
+
+        @media(max-width:768px){
+            .gallery {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 200px;
+            }
+        }
+
+        @media(max-width:480px){
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-item {
+                height: 200px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌟 Image Gallery</h1>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="nature">Nature</button>
+            <button class="filter-btn" data-filter="city">City</button>
+            <button class="filter-btn" data-filter="portrait">Portrait</button>
+            <button class="filter-btn" data-filter="abstract">Abstract</button>
+        </div>
+
+        <div class="gallery" id="gallery"></div>
+
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="closeBtn">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+        <img id="lightboxImg" src="" alt="Lightbox Image">
+    </div>
+
+    <script>
+
+        const images = [
+            { src: 'https://hikinginthesmokymountains.com/media/669f3f1fe4c0aee819d4567e/original.webp', category: 'nature', title: 'Mountain Sunset' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQg23uP6ddRiuxfIcLA9vTygJ6UMMZMQhbMg&s', category: 'city', title: 'City Skyline' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkp5V6_lD8u7twlzMCqgwfaiMOz5jwd2C00w&s', category: 'nature', title: 'Forest Path' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOArkyzyeJF4-i38YQbLAgY3xf0FIbIAKYmw&s', category: 'portrait', title: 'Portrait 1' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0xWhW0AfxP_Mpzz0_S160CdqQozwV696yrw&s', category: 'abstract', title: 'Abstract Colors' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS-pt0jblsEaYMVYqBe1Lo1sk_nTEE2DGsSw&s', category: 'portrait', title: 'Portrait 2' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS44H1xzkZjlNcXfipwB0GnEzLf9n2leNGMqQ&s', category: 'city', title: 'Urban Night' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPOY8cCcm-FCpiKlSHX6zjHHyXh2B6ddHpmQ&s', category: 'nature', title: 'Lake Reflection' },
+            { src: 'https://media.architecturaldigest.com/photos/55f9e1239bff6eeb3a240b6b/1:1/w_545,h_545,c_limit/dam-images-daily-2015-06-50-modern-buildings-modern-architecture-design-museum-01.jpg', category: 'city', title: 'Modern Architecture' },
+            { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLd4YyHPL-7urKbEhpUIudDlZxGbjKVqrGZA&s', category: 'nature', title: 'Wildflowers' }
+        ];
+
+        let currentIndex = 0;
+        let currentFilter = 'all';
+
+        function initGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            images.forEach((image, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.dataset.index = index;
+                item.innerHTML = `<div class="category">${image.category}</div><img src="${image.src}" alt="${image.title}" loading="lazy">`;
+                item.addEventListener('click', () => openLightbox(index));
+                gallery.appendChild(item);
+            });
+        }
+
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    applyFilter();
+                });
+            });
+        }
+
+        function applyFilter() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach(item => {
+                const category = images[item.dataset.index].category;
+                if (currentFilter === 'all' || category === currentFilter) item.classList.remove('hidden');
+                else item.classList.add('hidden');
+            });
+        }
+
+        function setupLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const closeBtn = document.getElementById('closeBtn');
+            const prevBtn = document.getElementById('lightboxPrev');
+            const nextBtn = document.getElementById('lightboxNext');
+
+            closeBtn.addEventListener('click', () => closeLightbox());
+            lightbox.addEventListener('click', e => { if(e.target === e.currentTarget) closeLightbox(); });
+            prevBtn.addEventListener('click', () => { currentIndex = (currentIndex-1+images.length)%images.length; openLightbox(currentIndex); });
+            nextBtn.addEventListener('click', () => { currentIndex = (currentIndex+1)%images.length; openLightbox(currentIndex); });
+
+            document.addEventListener('keydown', e => {
+                if(!lightbox.classList.contains('active')) return;
+                if(e.key==='Escape') closeLightbox();
+                if(e.key==='ArrowLeft') { currentIndex=(currentIndex-1+images.length)%images.length; openLightbox(currentIndex); }
+                if(e.key==='ArrowRight') { currentIndex=(currentIndex+1)%images.length; openLightbox(currentIndex); }
+            });
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            lightboxImg.src = images[index].src;
+            lightboxImg.alt = images[index].title;
+            lightbox.classList.add('active');
+            document.body.style.overflow='hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow='auto';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGallery();
+            setupFilters();
+            setupLightbox();
+        });
+
+    </script>
+
+</body>
+</html>
